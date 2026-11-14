@@ -52,6 +52,15 @@ Layout (`docs/ARCHITECTURE.md`): `packages/core` holds the parser, checks, quali
 
 Before starting new work, update your fork with `gh repo sync <your-user>/vigil` (or GitHub's *Sync fork* button), then `git pull` locally.
 
+### Versioning and releases
+
+Vigil uses one application version, stored in the root `package.json`. Workspace packages remain unversioned. The proposed first release is `0.1.0`, currently under development.
+
+- Use semantic versioning (`MAJOR.MINOR.PATCH`). From `1.0.0`, increment the major version for incompatible changes, the minor version for backward-compatible features, and the patch version for backward-compatible fixes. During `0.x` development, document breaking changes explicitly.
+- Record user-facing changes under `Unreleased` in [`CHANGELOG.md`](CHANGELOG.md).
+- When a release is confirmed, move its entries into a version heading with the actual release date (`## [0.1.0] - YYYY-MM-DD`), keep `Unreleased` above it, and ensure the root version matches the release heading. A version in `package.json` identifies the intended version during development. Record it as released only when it is published.
+- Before publishing, run `bun run lint`, `bun run typecheck`, and `bun test`.
+
 ### KAP data
 
 KAP files are not committed. Download a quarter into `data/raw/{year}_{quarter}/` with `bun run download 2026 2 data/raw`. The bulk endpoint is:

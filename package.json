@@ -1,5 +1,6 @@
 {
   "name": "vigil",
+  "version": "0.1.0",
   "private": true,
   "description": "Deterministic findings from Borsa Istanbul financial statements published on KAP. Not investment advice.",
   "license": "Apache-2.0",
