@@ -33,6 +33,14 @@ export type Routes = (v1: Hono) => void;
 export interface AppOptions {
   /** Registers the route modules on the `/v1` app. */
   routes?: Routes[];
+  /**
+   * Evaluated on every readiness request; omitted means not ready.
+   * Return true only while Zova and DuckDB are open and available, Zova application schema migrations have
+   * succeeded, and DuckDB migrations and initialization (including required views) have succeeded.
+   * The process owner (#168) tracks this lifecycle: return false during startup, known initialization failures
+   * and shutdown. Unexpected exceptions use the common internal error handler.
+   */
+  isReady?: () => boolean;
   /** Called with errors that become `internal`, for the log (#196). */
   onInternalError?: (error: unknown) => void;
 }
@@ -41,6 +49,12 @@ export interface AppOptions {
 export function createApp(options: AppOptions = {}): Hono {
   const app = new Hono();
   const v1 = new Hono();
+  // Register first and finish the response so external routes cannot shadow these endpoints.
+  v1.get("/health", (c) => c.json({ status: "ok" }, 200));
+  v1.get("/ready", (c) => {
+    if (options.isReady?.() !== true) throw new ApiError("not_ready", "Sunucu henüz hazır değil.");
+    return c.json({ status: "ok" }, 200);
+  });
   for (const register of options.routes ?? []) register(v1);
   app.route("/v1", v1);
 
